@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("====================================");
 
     initializeMenu();
+    loadPage("dashboard");
 
 });
 
@@ -33,7 +34,9 @@ function initializeMenu() {
 
             this.classList.add("active");
 
-            console.log(this.innerText.trim() + " Selected");
+            const page = this.dataset.page;
+
+            loadPage(page);
 
         });
 
@@ -41,7 +44,46 @@ function initializeMenu() {
 
 }
 
+/*---------------------------------------------------------
+    Load Page
+----------------------------------------------------------*/
 
+function loadPage(page) {
+
+    const contentArea = document.getElementById("contentArea");
+
+    fetch(`pages/${page}.html`)
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error("Page not found");
+            }
+
+            return response.text();
+
+        })
+        .then(html => {
+
+            contentArea.innerHTML = html;
+
+            document.querySelector(".topbar h3").textContent =
+                page.replace("-", " ")
+                    .replace(/\b\w/g, c => c.toUpperCase());
+
+        })
+        .catch(error => {
+
+            contentArea.innerHTML = `
+                <div class="alert alert-danger">
+                    Unable to load page : ${page}.html
+                </div>
+            `;
+
+            console.error(error);
+
+        });
+
+}
 /*---------------------------------------------------------
     Utility Functions
 ----------------------------------------------------------*/
